@@ -1,0 +1,28 @@
+{
+    "tracks": [
+        {
+            "id": "track-001",
+            "title": "Gangnam Style",
+            "artist": "PSY",
+            "additional_artists": [],
+            "album": "Psy 6 (Six Rules), Part 1",
+            "duration": "03:39"
+        },
+        {
+            "id": "track-002",
+            "title": "Counting Stars",
+            "artist": "OneRepublic",
+            "additional_artists": [],
+            "album": "Native",
+            "duration": "04:17"
+        },
+        {
+            "id": "track-003",
+            "title": "GAS GAS GAS EXTENDED MIX",
+            "artist": "Manuel",
+            "additional_artists": [],
+            "album": "Super Eurobeat",
+            "duration": "04:21"
+        }
+    ]
+}

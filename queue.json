@@ -1,1 +1,14 @@
-
+{
+    "queue": {
+        "tracks": [
+            "track-001",
+            "track-002",
+            "track-003",
+            "track-004"
+        ],
+        "current_index": 0,
+        "shuffled": false,
+        "repeat": false,
+        "total_duration": "15:12"
+    }
+}
