@@ -15,7 +15,7 @@ class track:
         feat = ""
         if self.additional_artist:
             feat = "(ft." +", ".join(self.additional_artist)+")"
-            return f"Title: {self.title}\nArtist: {self.artist}{feat}\nAlbum: {self.album}"
+            return f"Title: {self.title}{feat} | Artist: {self.artist} | Album: {self.album}"
         
 class duration(track):
     def __init__(self,title,artist,album,additional_artist,duration):
@@ -32,5 +32,5 @@ class duration(track):
         return f"{minutes:02}:{seconds:02}"
     
     def __str__(self):
-        return f"{super().__str__()}\nDuration: {self.duration_second}"
+        return f"{super().__str__()} | Duration: {self.duration_second}"
     
