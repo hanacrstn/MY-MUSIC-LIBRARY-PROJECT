@@ -104,7 +104,7 @@ class PlaylistManager:
             json.dump(data, f, indent=4)
 
 def main():
-    file_path = r"C:\Users\MACHENIKE\OneDrive\Desktop\DSA_FinalProject\store.json"
+    file_path = r"store.json"
     manager = PlaylistManager(file_path)
 
     while True:
