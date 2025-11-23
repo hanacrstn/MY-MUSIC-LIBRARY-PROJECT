@@ -32,5 +32,5 @@ class duration(track):
         return f"{minutes:02}:{seconds:02}"
     
     def __str__(self):
-        return f"{super().__str__()} | Duration: {self.duration_second}"
+        return f"{super().__str__()} | Duration: {self.get_duration()}"
     
