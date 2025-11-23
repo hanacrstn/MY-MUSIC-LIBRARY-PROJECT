@@ -34,5 +34,3 @@ class duration(track):
     def __str__(self):
         return f"{super().__str__()}\nDuration: {self.duration_second}"
     
-T1 =  duration("Gangnam Style","Psy","Number6",["Artist 1", "Artist 2"], "3:39")
-print(T1)
