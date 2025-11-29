@@ -4,7 +4,7 @@
 import json
 
 class Track:
-    def __init__(self, title, artist, album, additional_artists=None):
+    def __init__(self, title, artist, album, additional_artists):
         self.title = title
         self.artist = artist
         self.album = album
@@ -26,18 +26,15 @@ class DurationTrack(Track):
         self.duration_seconds = self._to_seconds(duration)
 
     def _to_seconds(self, duration):
-        """Convert mm:ss string to total seconds."""
         minutes, seconds = map(int, duration.split(":"))
         return minutes * 60 + seconds
 
     def get_duration(self):
-        """Return duration as mm:ss string."""
         minutes = self.duration_seconds // 60
         seconds = self.duration_seconds % 60
         return f"{minutes:02}:{seconds:02}"
 
     def get_seconds(self):
-        """Return duration in total seconds."""
         return self.duration_seconds
 
     def __str__(self):
