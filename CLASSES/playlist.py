@@ -1,5 +1,5 @@
 import json
-from Track import track, duration
+from Track import Track, DurationTrack
 
 class Playlist:
     def __init__(self, name):
@@ -22,11 +22,11 @@ class Playlist:
         result = []
         for t in self.__tracks:
             result.append({
-                "title": t.title,
+                "title": t.title, 
                 "artist": t.artist,
                 "album": t.album,
-                "additional_artist": t.additional_artist,
-                "duration": t.get_duration() if isinstance(t, duration) else None
+                "additional_artists": t.additional_artists,
+                "duration": t.get_duration() if isinstance(t, DurationTrack) else None
             })
         return result
 
@@ -35,19 +35,19 @@ class Playlist:
         playlist = cls(name)
         for t in track_list:
             if t.get("duration"):
-                track_obj = duration(
+                track_obj = DurationTrack(
                     t["title"],
                     t["artist"],
                     t["album"],
-                    t.get("additional_artist", []),
+                    t.get("additional_artists", []),
                     t["duration"]
                 )
             else:
-                track_obj = track(
+                track_obj = Track(
                     t["title"],
                     t["artist"],
                     t["album"],
-                    t.get("additional_artist", [])
+                    t.get("additional_artists", [])
                 )
             playlist.addTrack(track_obj)
         return playlist
@@ -59,11 +59,14 @@ class PlaylistManager:
         self.load_from_json()
 
     def load_from_json(self):
-        with open(self.file_path, "r") as f:
-            data = json.load(f)
-        for playlist_obj in data.get("Playlists", []):
-            for name, tracks in playlist_obj.items():
-                self.playlists[name] = Playlist.fetch_dict(name, tracks)
+        try:
+            with open(self.file_path, "r") as f:
+                data = json.load(f)
+            for playlist_obj in data.get("Playlists", []):
+                for name, tracks in playlist_obj.items():
+                    self.playlists[name] = Playlist.fetch_dict(name, tracks)
+        except (FileNotFoundError, json.JSONDecodeError):
+            self.playlists = {}
 
     def view_playlists(self):
         return list(self.playlists.keys())
@@ -73,8 +76,8 @@ class PlaylistManager:
             return []
         tracks_info = []
         for t in self.playlists[playlist_name].getTracks():
-            feat = f"(ft. {', '.join(t.additional_artist)})" if t.additional_artist else ""
-            duration_str = t.get_duration() if isinstance(t, duration) else ""
+            feat = f"(ft. {', '.join(t.additional_artists)})" if t.additional_artists else ""
+            duration_str = t.get_duration() if isinstance(t, DurationTrack) else ""
             tracks_info.append(f"{t.title} - {t.artist}{feat} ({t.album}) [{duration_str}]")
         return tracks_info
 
@@ -158,7 +161,7 @@ def main():
                 add_artist = input("Enter additional artists (comma separated): ").split(",")
                 add_artist = [a.strip() for a in add_artist]
             dur = input("Duration (mm:ss): ")
-            track_obj = duration(title, artist, album, add_artist, dur)
+            track_obj = DurationTrack(title, artist, album, add_artist, dur)
             manager.add_track_to_playlist(playlist_name, track_obj)
             print("Track added.")
 
@@ -169,3 +172,4 @@ def main():
 
         else:
             print("Invalid choice. Try again.")
+
