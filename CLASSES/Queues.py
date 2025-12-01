@@ -34,9 +34,7 @@ class Queue:
 
     def add_track(self, track):
        if track is None:
-            print("Cannot add None as a track.")
-            return False
-    #wala pa 
+            
             
     def add_play(self, playlist):
      if playlist is None:
@@ -53,7 +51,7 @@ class Queue:
             else:
                 print(" Playlist format not recognized.")
                 return False
-           #wala pa nahuman 
+           
 
     def queue_pagination(self, , items_per_page=10):
         try:
