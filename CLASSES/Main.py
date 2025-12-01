@@ -102,46 +102,7 @@ class MusicLibrary:
             json.dump(data, f, indent=2)
 
 
-"""
-def main_menu():
-    while True:
-        print("\tMAIN MENU")
-        print("[1] Music Player")
-        print("[2] Add New Track")
-        print("[3] View All Tracks")
-        print("[4] Create Playlist")
-        print("[5] Exit")
-        try:
-            choose = int(input("Choose operation(1-5): "))
-            if choose == 1:
-                while True:
-                    print("\tMUSIC PLAYER")
-                    print("[1] Music Library")
-                    print("[2] Playlist")
-                    print("[3] Go back")
-                    try:
-                        operation = int(input("Choose operation(1-3): "))
-                        if operation == 1:
-                            print("\tMUSIC LIBRARY")
-                            print()
-                            pass
-                        elif operation == 2:
-                            print("\tPLAYLIST")
-                            print()
-                            pass
-                        elif operation == 3:
-                            break
-                        else:
-                             print("Invalid input!")
-                    except Exception as e:
-                        print("Invalid input!")
-                        print()
-    
-            elif choose == 2:
-                print("\tADD NEW TRACKS")
-                print()
-                pass
-            elif choose == 3:
+ choose == 3:
                 print("\tVIEW ALL TRACKS")
                 print()
                 pass
@@ -158,5 +119,3 @@ def main_menu():
         except Exception as e:
             print("Invalid input")
             print()
-main_menu()
-"""
