@@ -41,7 +41,7 @@ class DurationTrack(Track):
         return f"{super().__str__()} | Duration: {self.get_duration()}"
 
 
-class MusicLibrary:
+class MusicSanctuary:
     def __init__(self, filename="store.json"):
         self.filename = filename
         self.tracks = []
@@ -53,7 +53,7 @@ class MusicLibrary:
         except (FileNotFoundError, json.JSONDecodeError):
             self.tracks = []
 
-    def load(self, d):
+    def loads(self, d):
         if "title" in d and "artist" in d and "album" in d and "duration" in d:
             return DurationTrack(
                 d["title"],
@@ -64,7 +64,7 @@ class MusicLibrary:
             )
         return d
 
-    def save(self):
+    def saves(self):
         data = {"Tracks": []}
         i = 0
         while i < len(self.tracks):
@@ -84,7 +84,7 @@ class MusicLibrary:
         with open(self.filename, "w") as file:
             json.dump(data, file, indent=4)
 
-    def add_track(self):
+    def additional_track(self):
         print('Enter "N" at any time to cancel.')
 
         title = input("Enter track title: ")
