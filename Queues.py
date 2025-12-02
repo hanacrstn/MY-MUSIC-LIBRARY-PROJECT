@@ -137,33 +137,48 @@ class Queue:
         return f"{track['title']}{feat} by {track['artist']} ({sec_to_min(track['duration'])})"
 
     def next(self):
-        """Move to next track - handles FIFO, shuffle, and repeat modes"""
+        """
+        Move to next track - properly handles all combinations of shuffle/repeat
+        
+        Behavior :
+        - Shuffle OFF, Repeat OFF: FIFO, tracks removed
+        - Shuffle OFF, Repeat ON:  FIFO, tracks re-added to end
+        - Shuffle ON,  Repeat OFF: Random removal until empty
+        - Shuffle ON,  Repeat ON:  Random selection, tracks kept (THIS WAS BROKEN)
+        """
         if self.size == 0:
             return "Queue is empty. No tracks to play."
 
-        # Store current track before any modifications
         current_track = self.current.track if self.current else None
 
-        # SHUFFLE MODE
+        # ========== SHUFFLE MODE ==========
         if self.shuffle_:
             if self.repeat_:
-                # Shuffle + Repeat: Keep all tracks, pick random
-                self.current = self.queuelist[random.randint(0, self.size - 1)]
-                self.save_state()
-                return self.current.track
+                # Shuffle + Repeat = Keep all tracks, just change current pointer
+                # Don't remove anything, just pick a random track
+                if self.size == 1:
+                    # Only one track, keep playing it
+                    self.save_state()
+                    return self.current.track
+                else:
+                    # Pick a random track (can be same track, that's valid shuffle behavior)
+                    self.current = self.queuelist[random.randint(0, self.size - 1)]
+                    self.save_state()
+                    return self.current.track
             else:
-                # Shuffle + No Repeat: Remove current, pick random from remaining
+                # Shuffle + No Repeat = Remove tracks randomly
                 if self.current:
                     self.remove_current()
                 if self.size > 0:
+                    # Pick random from remaining tracks
                     self.current = self.queuelist[random.randint(0, self.size - 1)]
                     return self.current.track
                 return "Queue is now empty."
 
-        # NORMAL FIFO MODE
+        # ========== NORMAL FIFO MODE ==========
         else:
             if self.repeat_:
-                # Repeat ON: Re-add current track to end, then dequeue front
+                # FIFO + Repeat = Re-add to end, then dequeue front
                 if current_track:
                     self.enqueue(current_track, save=False)
             
