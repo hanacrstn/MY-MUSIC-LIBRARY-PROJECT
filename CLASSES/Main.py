@@ -1,5 +1,5 @@
 
-#MAIN
+#MAIN Class
 
 from Track import Track
 from MusicLibrary import MusicLibrary
