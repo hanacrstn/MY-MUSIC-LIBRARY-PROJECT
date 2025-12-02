@@ -85,6 +85,7 @@ class Playlist:
 
             self.data["Playlists"].append({playlistName: []})
             save(self.data)
+            self.data = load()  # Reload data after saving
             print("\n" + "=" * 60)
             print("✓ Playlist added successfully!".center(60))
             print(f"'{playlistName}' created.".center(60))
@@ -136,15 +137,16 @@ class Playlist:
         except (ValueError, IndexError):
             print("\nInvalid input. Please enter a valid playlist number.")
     
-    def displayPlaylists(self, with_pagination=False):
+    def displayPlaylists(self, with_pagination=False, allow_selection=False):
         self.updatePlaylistList()
         if not self.list:
             print("There are no Playlists made!")
-            return
+            return None
         
         if not with_pagination:
             for i, name in enumerate(self.list, 1):
                 print(f"    [{i}] {name}")
+            return None
         else:
             pagination = Pagination(self.list, items_per_page=10)
             while True:
@@ -160,15 +162,22 @@ class Playlist:
                 print("N → Next Page | P → Previous Page | Q → Back")
                 print("-" * 60)
                 
-                choice = input("Choose: ").lower()
+                choice = input("Choose: ").lower().strip()
                 if choice == 'n':
-                    pagination.next_page() if pagination.current_page < pagination.total_pages() else print("Already at the last page.")
+                    if pagination.current_page < pagination.total_pages():
+                        pagination.next_page()
+                    else:
+                        print("Already at the last page.")
                 elif choice == 'p':
-                    pagination.previous_page() if pagination.current_page > 1 else print("Already at the first page.")
+                    if pagination.current_page > 1:
+                        pagination.previous_page()
+                    else:
+                        print("Already at the first page.")
                 elif choice == 'q':
-                    break
+                    return None
                 else:
-                    print("Invalid option.")
+                    if choice:
+                        print("Invalid option.")
 
     def searchTrack(self, track):
         self.data = load()
@@ -217,8 +226,13 @@ class Playlist:
         return results
 
     def searchedTracks(self, option, playlist_name, matching_tracks):
+        # Reload data to ensure we have latest
+        self.data = load()
         playlist_tracks = self._find_playlist_tracks(playlist_name)
-        if not playlist_tracks:
+        
+        if playlist_tracks is None:
+            print(f"\n[DEBUG] Looking for playlist: '{playlist_name}'")
+            print(f"[DEBUG] Available playlists: {[list(p.keys())[0] for p in self.data.get('Playlists', [])]}")
             print("\nPlaylist not found.")
             return False
 
@@ -276,13 +290,21 @@ class Playlist:
         return self._paginated_selection(tracks, "Select a Track", track_formatter, allow_selection=True)
 
     def addTrack(self, playlist_name):
+        # Reload data FIRST before anything else
+        self.data = load()
+        
         selected_track = self.displayTracksForSelection()
         if not selected_track:
             print("\nTrack addition cancelled.")
             return
 
+        # Reload data again after user interaction to ensure freshness
+        self.data = load()
+        
         playlist_tracks = self._find_playlist_tracks(playlist_name)
-        if not playlist_tracks:
+        if playlist_tracks is None:
+            print(f"\n[DEBUG] Looking for playlist: '{playlist_name}'")
+            print(f"[DEBUG] Available playlists: {[list(p.keys())[0] for p in self.data.get('Playlists', [])]}")
             print("\nPlaylist not found.")
             return
 
