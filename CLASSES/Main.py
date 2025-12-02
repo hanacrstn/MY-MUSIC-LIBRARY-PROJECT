@@ -27,7 +27,6 @@ class main:
 
     def main(self):
         while True:
-            # WELCOME SCREEN
             self.banner("WELCOME")
             print("Press [M] to Open Music Player".center(60))
             print("═" * 60)
@@ -43,9 +42,6 @@ class main:
 
             choice = main.prompt("Enter choice: ")
 
-            # ==========================
-            # OPEN MUSIC PLAYER
-            # ==========================
             if choice == "m":
                 while True:
                     self.banner("MUSIC PLAYER")
@@ -55,9 +51,6 @@ class main:
 
                     choice = main.prompt("Enter choice: ")
 
-                    # ==========================
-                    # PLAY FROM LIBRARY
-                    # ==========================
                     if choice == '1':
                         while True:
                             try:
