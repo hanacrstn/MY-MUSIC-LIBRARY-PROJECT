@@ -1,0 +1,180 @@
+{
+    "Tracks": [
+        {
+            "id": 1,
+            "title": "Manchild",
+            "artist": "Sabrina Carpenter",
+            "featured_artist": "",
+            "album": "Short n Sweet",
+            "duration": "180"
+        },
+        {
+            "id": 2,
+            "title": "Video Games",
+            "artist": "Lana Del Rey",
+            "featured_artist": "",
+            "album": "Born to Die",
+            "duration": "255"
+        },
+        {
+            "id": 3,
+            "title": "Shrike",
+            "artist": "Hozier",
+            "featured_artist": "",
+            "album": "Stear",
+            "duration": "135"
+        },
+        {
+            "id": 4,
+            "title": "Hold Me Down",
+            "artist": "Daniel Caesar",
+            "featured_artist": "",
+            "album": "Hold",
+            "duration": "231"
+        },
+        {
+            "id": 5,
+            "title": "Blinding Lights",
+            "artist": "The Weeknd",
+            "featured_artist": "",
+            "album": "After Hours",
+            "duration": "200"
+        },
+        {
+            "id": 6,
+            "title": "Levitating",
+            "artist": "Dua Lipa",
+            "featured_artist": "",
+            "album": "Future Nostalgia",
+            "duration": "203"
+        },
+        {
+            "id": 7,
+            "title": "12",
+            "artist": "23",
+            "featured_artist": "23333",
+            "album": "121",
+            "duration": "90"
+        },
+        {
+            "id": 8,
+            "title": "123123",
+            "artist": "21313",
+            "featured_artist": "123123",
+            "album": "12313221",
+            "duration": "80"
+        },
+        {
+            "id": 9,
+            "title": "2341341234",
+            "artist": "123412421",
+            "featured_artist": "12341234",
+            "album": "12341234",
+            "duration": "150"
+        },
+        {
+            "id": 10,
+            "title": "234123",
+            "artist": "1341243",
+            "featured_artist": "12341124",
+            "album": "1234124",
+            "duration": "50"
+        },
+        {
+            "id": 11,
+            "title": "213412341",
+            "artist": "1234121",
+            "featured_artist": "12131",
+            "album": "123123",
+            "duration": "120"
+        },
+        {
+            "id": 12,
+            "title": "lance",
+            "artist": "balubar",
+            "featured_artist": "idol",
+            "album": "1",
+            "duration": "50"
+        },
+        {
+            "id": 13,
+            "title": "ventura",
+            "artist": "ferd",
+            "featured_artist": "",
+            "album": "2",
+            "duration": "90"
+        },
+        {
+            "id": 14,
+            "title": "sjye",
+            "artist": "navarro",
+            "featured_artist": "",
+            "album": "4",
+            "duration": "340"
+        },
+        {
+            "id": 15,
+            "title": "lester",
+            "artist": "ventura",
+            "featured_artist": "",
+            "album": "9",
+            "duration": "900"
+        }
+    ],
+    "Playlists": [
+        {
+            "alps": [
+                {
+                    "id": 5,
+                    "title": "Blinding Lights",
+                    "artist": "The Weeknd",
+                    "featured_artist": "",
+                    "album": "After Hours",
+                    "duration": "200"
+                },
+                {
+                    "id": 1,
+                    "title": "Manchild",
+                    "artist": "Sabrina Carpenter",
+                    "featured_artist": "",
+                    "album": "Short n Sweet",
+                    "duration": "180"
+                }
+            ]
+        },
+        {
+            "Hannah": [
+                {
+                    "id": 1,
+                    "title": "Manchild",
+                    "artist": "Sabrina Carpenter",
+                    "featured_artist": "",
+                    "album": "Short n Sweet",
+                    "duration": "180"
+                },
+                {
+                    "id": 2,
+                    "title": "Video Games",
+                    "artist": "Lana Del Rey",
+                    "featured_artist": "",
+                    "album": "Born to Die",
+                    "duration": "255"
+                },
+                {
+                    "id": 5,
+                    "title": "Blinding Lights",
+                    "artist": "The Weeknd",
+                    "featured_artist": "",
+                    "album": "After Hours",
+                    "duration": "200"
+                }
+            ]
+        },
+        {
+            "jojo": []
+        },
+        {
+            "12313": []
+        }
+    ]
+}
