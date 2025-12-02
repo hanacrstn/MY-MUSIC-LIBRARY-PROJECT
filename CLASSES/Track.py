@@ -1,22 +1,36 @@
-
 from Duration import checkformat
 
 class Track:
     counter = 0
     def __init__(self, id, title, artist, album, duration):
-        self.id = id
-        self.title = title
-        self.artist = artist
-        self.album = album
-        self.duration = checkformat(duration)
+        self.__id = id
+        self.__title = title
+        self.__artist = artist
+        self.__album = album
+        self.__duration = checkformat(duration)
+
+    def getID (self):
+        return self.__id
+
+    def getTitle (self):
+        return self.__title
+    
+    def getArtist (self):
+        return self.__artist
+    
+    def getAlbum (self):
+        return self.__album
+    
+    def getDuration (self):
+        return self.__duration
 
     def to_dict(self):
         return {
-            "id" : self.id,
-            "title": self.title,
-            "artist": self.artist,
-            "album": self.album,
-            "duration": self.duration
+            "id" : self.__id,
+            "title": self.__title,
+            "artist": self.__artist,
+            "album": self.__album,
+            "duration": self.__duration
         }
     
     @classmethod
