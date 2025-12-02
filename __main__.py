@@ -294,11 +294,11 @@ class main:
     def _playlist_manager_menu(self):
         """Handle playlist manager submenu"""
         while True:
-            self.playlist.data = load()  # Reload data at start of each loop
-            self.playlist.updatePlaylistList()
+            # Reinitialize playlist object to get fresh data
+            self.playlist = Playlist()
             
             self.banner("PLAYLIST MANAGER")
-            print("\nV → View All Playlists")
+            print("\nV → View All Playlists (Paginated)")
             print("A → Add Tracks to Playlist")
             print("R → Remove Track from Playlist")
             print("D → Delete Playlist")
@@ -334,8 +334,8 @@ class main:
 
     def _remove_track_from_playlist(self):
         """Remove track from playlist helper"""
-        self.playlist.data = load()  # Reload data
-        self.playlist.updatePlaylistList()
+        # Reinitialize to get fresh data
+        self.playlist = Playlist()
         
         print("\nSelect a playlist:")
         self.playlist.displayPlaylists()
@@ -351,8 +351,8 @@ class main:
 
     def _add_track_to_playlist(self):
         """Add track to playlist helper"""
-        self.playlist.data = load()  # Reload data to get latest playlists
-        self.playlist.updatePlaylistList()
+        # CRITICAL: Reload playlist data to get latest changes
+        self.playlist = Playlist()  # Reinitialize to get fresh data
         
         print("\nSelect a playlist:")
         self.playlist.displayPlaylists()
