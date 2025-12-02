@@ -298,12 +298,13 @@ class main:
             self.playlist = Playlist()
             
             self.banner("PLAYLIST MANAGER")
-            print("\nV → View All Playlists")
+            print("\nV → View All Playlists (Paginated)")
+            print("S → Select Playlist to View Tracks")
             print("A → Add Tracks to Playlist")
             print("R → Remove Track from Playlist")
             print("D → Delete Playlist")
-            print("S → Select Playlist to View Tracks")
             print("E → Exit to Main Menu")
+            print("\nOr enter playlist number directly to view tracks")
 
             choice = main.prompt("Choose: ")
 
@@ -326,6 +327,7 @@ class main:
             elif choice == 'e':
                 break
             else:
+                # Try to parse as playlist number
                 try:
                     index = int(choice)
                     self.playlist.displayTracks(index)
