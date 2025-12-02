@@ -1,53 +1,68 @@
+
+
 from Duration import checkformat
 
 class Track:
     counter = 0
     def __init__(self, id, title, artist, album, duration):
-        self.__id = id
-        self.__title = title
-        self.__artist = artist
-        self.__album = album
-        self.__duration = checkformat(duration)
-
-    def getID (self):
-        return self.__id
-
-    def getTitle (self):
-        return self.__title
-    
-    def getArtist (self):
-        return self.__artist
-    
-    def getAlbum (self):
-        return self.__album
-    
-    def getDuration (self):
-        return self.__duration
+        self.id = id
+        self.title = title.strip() if title else ""
+        self.artist = artist.strip() if artist else ""
+        self.album = album.strip() if album else ""
+        self.duration = checkformat(duration)
 
     def to_dict(self):
         return {
-            "id" : self.__id,
-            "title": self.__title,
-            "artist": self.__artist,
-            "album": self.__album,
-            "duration": self.__duration
+            "id": self.id,
+            "title": self.title,
+            "artist": self.artist,
+            "album": self.album,
+            "duration": self.duration
         }
     
     @classmethod
     def from_dict(cls, data):
-        return cls(data["id"], data["title"], data["artist"], data["album"], data["duration"])
+        return cls(
+            data["id"], 
+            data["title"], 
+            data["artist"], 
+            data["album"], 
+            data["duration"]
+        )
     
     def __str__(self):
-        return f"{self.__title} by {self.__artist} ({self.get_duration()})"
+        from Duration import sec_to_min
+        return f"{self.title} by {self.artist} ({sec_to_min(self.duration)})"
 
 
-class Playlist_:
-    def __init__(self, id, playlist):
-        self.id = id
-        self.playlist = playlist
-
-    def convertList (self):
+class Playlist:
+    
+    def __init__(self, name, tracks=None):
+        self.name = name
+        self.tracks = tracks if tracks is not None else []
+    
+    def add_track(self, track):
+        if track not in self.tracks:
+            self.tracks.append(track)
+            return True
+        return False
+    
+    def remove_track(self, track):
+        if track in self.tracks:
+            self.tracks.remove(track)
+            return True
+        return False
+    
+    def get_duration(self):
+        return sum(int(track.duration) for track in self.tracks)
+    
+    def to_dict(self):
         return {
-            "id" : self.id,
-            self.playlist : []
-            }
+            self.name: [
+                track.to_dict() if isinstance(track, Track) else track
+                for track in self.tracks
+            ]
+        }
+    
+    def __str__(self):
+        return f"Playlist: {self.name} ({len(self.tracks)} tracks)"
