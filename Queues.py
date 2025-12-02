@@ -110,6 +110,9 @@ class Queue:
             self.save_state()
             return removed_track
         
+        # Store next node before removing current
+        next_node = self.current.next
+        
         self.queuelist.remove(self.current)
         self.current.prev.next = self.current.next
         self.current.next.prev = self.current.prev
@@ -119,6 +122,8 @@ class Queue:
         if self.current == self.rear:
             self.rear = self.current.prev
         
+        # Update current to next node
+        self.current = next_node
         self.size -= 1
         self.save_state()
         return removed_track
@@ -132,33 +137,58 @@ class Queue:
         return f"{track['title']}{feat} by {track['artist']} ({sec_to_min(track['duration'])})"
 
     def next(self):
-        """Move to next track and remove the current one (FIFO)"""
+        """Move to next track - handles FIFO, shuffle, and repeat modes"""
         if self.size == 0:
             return "Queue is empty. No tracks to play."
 
-        if self.shuffle_:
-            if self.current:
-                self.remove_current()
-            if self.size > 0:
-                self.current = self.queuelist[random.randint(0, self.size - 1)]
-                return self.current.track
-            return "Queue is now empty."
+        # Store current track before any modifications
+        current_track = self.current.track if self.current else None
 
-        if self.current:
+        # SHUFFLE MODE
+        if self.shuffle_:
+            if self.repeat_:
+                # Shuffle + Repeat: Keep all tracks, pick random
+                self.current = self.queuelist[random.randint(0, self.size - 1)]
+                self.save_state()
+                return self.current.track
+            else:
+                # Shuffle + No Repeat: Remove current, pick random from remaining
+                if self.current:
+                    self.remove_current()
+                if self.size > 0:
+                    self.current = self.queuelist[random.randint(0, self.size - 1)]
+                    return self.current.track
+                return "Queue is now empty."
+
+        # NORMAL FIFO MODE
+        else:
+            if self.repeat_:
+                # Repeat ON: Re-add current track to end, then dequeue front
+                if current_track:
+                    self.enqueue(current_track, save=False)
+            
+            # Remove front track (FIFO)
             self.dequeue()
+            
             if self.size > 0:
                 self.current = self.front
                 self.save_state()
                 return self.current.track
+            
             return "Queue is now empty."
-        
-        self.current = self.front
-        self.save_state()
-        return self.current.track
     
     def prev(self):
-        """Move to previous track (not available in FIFO mode)"""
-        return "Previous track is not available in FIFO mode. Tracks are removed after playing."
+        """Move to previous track"""
+        if not self.repeat_:
+            return "Previous track is not available in FIFO mode. Tracks are removed after playing."
+        
+        # With repeat mode, we can go backwards in circular list
+        if self.size == 0:
+            return "Queue is empty."
+        
+        self.current = self.current.prev
+        self.save_state()
+        return self.current.track
 
     def toggle_playing(self):
         self.playing_ = not self.playing_
@@ -185,6 +215,7 @@ class Queue:
         return "ON" if self.repeat_ else "OFF"
     
     def clear_queue(self):
+        """Completely clear the queue"""
         self.__init__()
         save_queue(None)
 
