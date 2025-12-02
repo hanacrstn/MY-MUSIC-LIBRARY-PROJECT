@@ -177,14 +177,26 @@ class main:
             elif choice == '4':
                 while True:
                     self.banner("PLAYLIST MANAGER")
-                    print("Available Playlists:")
-                    self.playlist.displayPlaylists()
-                    print("\nA → Add Tracks to Playlist")
+                    print("\nV → View All Playlists")
+                    print("A → Add Tracks to Playlist")
+                    print("S → Select Playlist to View Tracks")
                     print("E → Exit to Main Menu")
 
                     choice = main.prompt("Choose: ")
 
-                    if choice == 'a':
+                    if choice == 'v':
+                        self.playlist.displayPlaylists(with_pagination=True)
+                    
+                    elif choice == 's':
+                        print("\nSelect a playlist:")
+                        self.playlist.displayPlaylists()
+                        try:
+                            index = int(input("Enter number: "))
+                            self.playlist.displayTracks(index)
+                        except:
+                            print("Invalid selection.")
+                    
+                    elif choice == 'a':
                         print("\nSelect a playlist:")
                         self.playlist.displayPlaylists()
                         try:
