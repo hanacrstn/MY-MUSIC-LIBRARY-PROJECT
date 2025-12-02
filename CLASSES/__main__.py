@@ -14,28 +14,36 @@ class main:
         self.library = MusicLibrary()
         self.playlist = Playlist()
         self.data = load()
+        self.queue = Queue()
+        
+        # Try to load saved queue state
+        if self.queue.load_state():
+            print("\n" + "=" * 60)
+            print("Previous queue session restored!".center(60))
+            print("=" * 60)
 
     @staticmethod
     def prompt(args: str) -> str:
         return input(args).lower()
 
     def banner(self, title):
-        print("\n" + "═" * 60)
+        print("\n" + "╔" * 60)
         print(title.center(60))
-        print("═" * 60)
+        print("╔" * 60)
 
     def main(self):
         while True:
             self.banner("WELCOME")
             print("Press [M] to Open Music Player".center(60))
-            print("═" * 60)
+            print("╔" * 60)
 
             print("MAIN MENU")
             print("-" * 45)
             print("  1 → Create New Track")
             print("  2 → View All Tracks")
-            print("  3 → Create Playlist")
-            print("  4 → View All Playlists")
+            print("  3 → Delete Track")
+            print("  4 → Create Playlist")
+            print("  5 → View All Playlists")
             print("  0 → Exit Program")
             print("-" * 45)
 
@@ -44,61 +52,117 @@ class main:
             if choice == "m":
                 while True:
                     self.banner("MUSIC PLAYER")
+                    
+                    # Check if queue exists from previous session
+                    if self.queue.size > 0:
+                        print("R → Resume Previous Queue")
+                    
                     print("1 → Play Music From Library (All Tracks)")
                     print("2 → Play Music From Playlist")
+                    print("3 → Clear Queue")
                     print("0 → Return to Main Menu")
 
                     choice = main.prompt("Enter choice: ")
-
-                    if choice == '1':
+                    
+                    if choice == 'r' and self.queue.size > 0:
+                        # Resume existing queue
+                        print(f"\nResuming: {self.queue.current_play()}\n")
+                        
                         while True:
-                            try:
-                                self.data = load()
-                                tracks = merge_sort(self.data["Tracks"][:], "title")
-                                queue = Queue()
+                            print(f"Shuffle: {self.queue.shuffle_status()} | Repeat: {self.queue.repeat_status()}\n")
+                            print(self.queue)
+                            print("\nOPTIONS:")
+                            print("  N → Next Track")
+                            print("  P → Previous Track")
+                            print("  1 → Playback Settings (Shuffle / Repeat)")
+                            print("  2 → Exit Player")
 
-                                self.banner("PLAYING FROM LIBRARY")
-                                print(f"Total Duration: {total_duration(self.data, 'Tracks')}\n")
+                            choice = main.prompt("Enter choice: ")
 
-                                for t in tracks:
-                                    queue.enqueue(t)
+                            if choice == '2': 
+                                break
+                            elif choice == 'n':
+                                track = self.queue.next()
+                                if isinstance(track, dict):
+                                    print(f"NOW PLAYING: {self.queue.current_play()}")
+                                else:
+                                    print(track)
+                            elif choice == 'p':
+                                track = self.queue.prev()
+                                if isinstance(track, dict):
+                                    print(f"NOW PLAYING: {self.queue.current_play()}")
+                                else:
+                                    print(track)
+                            elif choice == '1':
+                                print("\nPlayback Options:")
+                                print("  1 → Toggle Shuffle")
+                                print("  2 → Toggle Repeat")
+                                opt = main.prompt("Choose: ")
+                                if opt == '1': 
+                                    self.queue.toggle_shuffle()
+                                    print(f"Shuffle: {self.queue.shuffle_status()}")
+                                elif opt == '2': 
+                                    self.queue.toggle_repeat()
+                                    print(f"Repeat: {self.queue.repeat_status()}")
 
-                                current = queue.current_play()
-                                print(f"NOW PLAYING: {current}\n")
+                    elif choice == '1':
+                        try:
+                            self.data = load()
+                            tracks = merge_sort(self.data["Tracks"][:], "title")
+                            self.queue = Queue()  # Create new queue
 
-                                while True:
-                                    print(f"Shuffle: {queue.shuffle_status()} | Repeat: {queue.repeat_status()}\n")
-                                    print(queue)
-                                    print("\nOPTIONS:")
-                                    print("  N → Next Track")
-                                    print("  P → Previous Track")
-                                    print("  1 → Playback Settings (Shuffle / Repeat)")
-                                    print("  2 → Exit Player")
+                            self.banner("PLAYING FROM LIBRARY")
+                            print(f"Total Duration: {total_duration(self.data, 'Tracks')}\n")
 
-                                    choice = main.prompt("Enter choice: ")
+                            for t in tracks:
+                                self.queue.enqueue(t)
 
-                                    if choice == '2': break
-                                    elif choice == 'n':
-                                        queue.next()
-                                        print(f"NOW PLAYING: {queue.current_play()}")
-                                    elif choice == 'p':
-                                        queue.prev()
-                                        print(f"NOW PLAYING: {queue.current_play()}")
-                                    elif choice == '1':
-                                        print("\nPlayback Options:")
-                                        print("  1 → Toggle Shuffle")
-                                        print("  2 → Toggle Repeat")
-                                        opt = main.prompt("Choose: ")
-                                        if opt == '1': queue.toggle_shuffle()
-                                        elif opt == '2': queue.toggle_repeat()
+                            current = self.queue.current_play()
+                            print(f"NOW PLAYING: {current}\n")
 
-                            except Exception as e:
-                                print(f"Error: {e}")
-                                if main.prompt("Try again? (y/n): ") != 'y': break
-                            break
+                            while True:
+                                print(f"Shuffle: {self.queue.shuffle_status()} | Repeat: {self.queue.repeat_status()}\n")
+                                print(self.queue)
+                                print("\nOPTIONS:")
+                                print("  N → Next Track")
+                                print("  P → Previous Track")
+                                print("  1 → Playback Settings (Shuffle / Repeat)")
+                                print("  2 → Exit Player")
+
+                                choice = main.prompt("Enter choice: ")
+
+                                if choice == '2': 
+                                    break
+                                elif choice == 'n':
+                                    track = self.queue.next()
+                                    if isinstance(track, dict):
+                                        print(f"NOW PLAYING: {self.queue.current_play()}")
+                                    else:
+                                        print(track)
+                                elif choice == 'p':
+                                    track = self.queue.prev()
+                                    if isinstance(track, dict):
+                                        print(f"NOW PLAYING: {self.queue.current_play()}")
+                                    else:
+                                        print(track)
+                                elif choice == '1':
+                                    print("\nPlayback Options:")
+                                    print("  1 → Toggle Shuffle")
+                                    print("  2 → Toggle Repeat")
+                                    opt = main.prompt("Choose: ")
+                                    if opt == '1': 
+                                        self.queue.toggle_shuffle()
+                                        print(f"Shuffle: {self.queue.shuffle_status()}")
+                                    elif opt == '2': 
+                                        self.queue.toggle_repeat()
+                                        print(f"Repeat: {self.queue.repeat_status()}")
+
+                        except Exception as e:
+                            print(f"Error: {e}")
+                            if main.prompt("Try again? (y/n): ") != 'y': 
+                                break
 
                     elif choice == '2':
-                        queue = Queue()
                         self.banner("PLAYING FROM PLAYLIST")
                         print("Select a playlist:\n")
 
@@ -110,7 +174,7 @@ class main:
                             self.playlist.updatePlaylistList()
 
                             if playlist_choice == 0:
-                                break
+                                continue
                             if playlist_choice < 0 or playlist_choice > len(self.playlist.list):
                                 print("Invalid playlist number.")
                                 continue
@@ -128,14 +192,15 @@ class main:
                                 continue
 
                             sorted_tracks = merge_sort(playlist_tracks, key="title")
-                            queue.enqueue_playlist(sorted_tracks)
+                            self.queue = Queue()  # Create new queue
+                            self.queue.enqueue_playlist(sorted_tracks)
 
                             print(f"NOW PLAYING FROM: {playlist_name}\n")
-                            print(f"NOW PLAYING: {queue.current_play()}\n")
+                            print(f"NOW PLAYING: {self.queue.current_play()}\n")
 
                             while True:
-                                print(f"Shuffle: {queue.shuffle_status()} | Repeat: {queue.repeat_status()}\n")
-                                print(queue.display())
+                                print(f"Shuffle: {self.queue.shuffle_status()} | Repeat: {self.queue.repeat_status()}\n")
+                                print(self.queue.display())
 
                                 print("\nOPTIONS:")
                                 print("  N → Next Track")
@@ -146,25 +211,45 @@ class main:
                                 choice = main.prompt("Choose: ")
 
                                 if choice == 'n':
-                                    queue.next()
-                                    print(f"NOW PLAYING: {queue.current_play()}")
+                                    track = self.queue.next()
+                                    if isinstance(track, dict):
+                                        print(f"NOW PLAYING: {self.queue.current_play()}")
+                                    else:
+                                        print(track)
                                 elif choice == 'p':
-                                    queue.prev()
-                                    print(f"NOW PLAYING: {queue.current_play()}")
+                                    track = self.queue.prev()
+                                    if isinstance(track, dict):
+                                        print(f"NOW PLAYING: {self.queue.current_play()}")
+                                    else:
+                                        print(track)
                                 elif choice == '1':
                                     print("1 → Toggle Shuffle\n2 → Toggle Repeat")
                                     opt = main.prompt("Choose: ")
-                                    if opt == '1': queue.toggle_shuffle()
-                                    elif opt == '2': queue.toggle_repeat()
-                                elif choice == '2': break
+                                    if opt == '1': 
+                                        self.queue.toggle_shuffle()
+                                        print(f"Shuffle: {self.queue.shuffle_status()}")
+                                    elif opt == '2': 
+                                        self.queue.toggle_repeat()
+                                        print(f"Repeat: {self.queue.repeat_status()}")
+                                elif choice == '2': 
+                                    break
 
                         except ValueError:
                             print("Invalid input. Enter a valid number.")
-
-                    elif choice == '0': break
+                    
+                    elif choice == '3':
+                        # Clear queue
+                        confirm = input("Clear queue? All data will be lost. (y/n): ").lower()
+                        if confirm == 'y':
+                            self.queue.clear_queue()
+                            print("\nQueue cleared successfully!")
+                    
+                    elif choice == '0': 
+                        break
 
             elif choice == '1':
-                self.library.createTrack(); self.data = load()
+                self.library.createTrack()
+                self.data = load()
 
             elif choice == '2':
                 self.banner("MUSIC LIBRARY")
@@ -172,13 +257,20 @@ class main:
                 self.library.displayTracks()
 
             elif choice == '3':
-                self.playlist.createPlaylist()
+                self.banner("DELETE TRACK")
+                self.library.deleteTrack()
+                self.data = load()
 
             elif choice == '4':
+                self.playlist.createPlaylist()
+
+            elif choice == '5':
                 while True:
                     self.banner("PLAYLIST MANAGER")
-                    print("\nV → View All Playlists")
+                    print("\nV → View All Playlists (Paginated)")
                     print("A → Add Tracks to Playlist")
+                    print("R → Remove Track from Playlist")
+                    print("D → Delete Playlist")
                     print("S → Select Playlist to View Tracks")
                     print("E → Exit to Main Menu")
 
@@ -196,38 +288,86 @@ class main:
                         except:
                             print("Invalid selection.")
                     
+                    elif choice == 'r':
+                        print("\nSelect a playlist:")
+                        self.playlist.displayPlaylists()
+                        try:
+                            idx = int(input("Enter number: ")) - 1
+                            if idx < 0 or idx >= len(self.playlist.list):
+                                print("Invalid playlist.")
+                                continue
+                            playlist_name = self.playlist.list[idx]
+                            self.playlist.removeTrackFromPlaylist(playlist_name)
+                        except ValueError:
+                            print("Invalid input.")
+                    
+                    elif choice == 'd':
+                        self.playlist.deletePlaylist()
+                    
                     elif choice == 'a':
                         print("\nSelect a playlist:")
                         self.playlist.displayPlaylists()
                         try:
                             idx = int(input("Enter number: ")) - 1
-                            if idx < 0 or idx >= len(self.playlist.list): raise ValueError
+                            if idx < 0 or idx >= len(self.playlist.list): 
+                                raise ValueError
                             playlist_name = self.playlist.list[idx]
                         except ValueError:
                             print("Invalid playlist.")
                             continue
 
                         while True:
-                            print("\n1 → Add From All Tracks\n2 → Search Tracks")
+                            print("\n1 → Add From All Tracks")
+                            print("2 → Search Tracks")
+                            print("0 → Cancel")
+                            
+                            choice_input = input("Choose: ").strip()
+                            
+                            if not choice_input:
+                                print("Invalid input. Please enter a valid choice.")
+                                continue
+                            
                             try:
-                                opt = int(input("Choose: "))
+                                opt = int(choice_input)
                                 if opt == 1:
                                     self.playlist.addTrack(playlist_name)
                                     break
                                 elif opt == 2:
-                                    query = input("Search: ")
+                                    query = input("Search: ").strip()
+                                    if not query:
+                                        print("Search query cannot be empty.")
+                                        continue
                                     matches = self.playlist.searchTrack(query)
+                                    if matches is None:
+                                        # User cancelled search
+                                        break
                                     if not matches:
                                         print("No matching tracks.")
+                                        continue
+                                    
+                                    print("\n1 → Add One")
+                                    print("2 → Add All")
+                                    print("0 → Cancel")
+                                    
+                                    sub_input = input("Choose: ").strip()
+                                    if not sub_input:
+                                        print("Invalid input. Please enter a valid choice.")
+                                        continue
+                                    
+                                    sub = int(sub_input)
+                                    result = self.playlist.searchedTracks(sub, playlist_name, matches)
+                                    if result or sub == 0:
                                         break
-                                    print("1 → Add One\n2 → Add All")
-                                    sub = int(input("Choose: "))
-                                    self.playlist.searchedTracks(sub, playlist_name, matches)
+                                elif opt == 0:
+                                    print("Operation cancelled.")
                                     break
+                                else:
+                                    print("Invalid option. Please choose 1, 2, or 0.")
                             except ValueError:
-                                print("Invalid input.")
+                                print("Invalid input. Please enter a number.")
 
-                    elif choice == 'e': break
+                    elif choice == 'e': 
+                        break
                     else:
                         try:
                             index = int(choice)
