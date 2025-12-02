@@ -1,9 +1,9 @@
 def normalize_duration(duration):
-    """
-    Convert any duration format to seconds (int).
-    Handles: int, "180", "3:00", etc.
-    Returns 0 for invalid input.
-    """
+    
+    #Convert any duration format to seconds (int).
+    #Handles: int, "180", "3:00", etc.
+    #Returns 0 for invalid input.
+    
     if isinstance(duration, int):
         return duration
     
