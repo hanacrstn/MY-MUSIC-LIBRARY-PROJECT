@@ -1,13 +1,13 @@
-# MAIN Class 
+#MAIN Class
 
 from Track import Track
-from Library import MusicLibrary  
-from Playlist import Playlist  
-from Util_Jason import load, save  
-from Duration import total_duration, sec_to_min, format_duration  
-from Queues import Queue  
-from Sorting import merge_sort  
-
+from Library import MusicLibrary
+from Playlist import Playlist
+from Util_Jason import load, save
+from Duration import total_duration
+from Queues import Queue
+from Sorting import merge_sort
+from Pagination import Pagination
 
 class main:
     def __init__(self):
@@ -77,8 +77,7 @@ class main:
 
                                     choice = main.prompt("Enter choice: ")
 
-                                    if choice == '2': 
-                                        break
+                                    if choice == '2': break
                                     elif choice == 'n':
                                         queue.next()
                                         print(f"NOW PLAYING: {queue.current_play()}")
@@ -90,15 +89,12 @@ class main:
                                         print("  1 → Toggle Shuffle")
                                         print("  2 → Toggle Repeat")
                                         opt = main.prompt("Choose: ")
-                                        if opt == '1': 
-                                            queue.toggle_shuffle()
-                                        elif opt == '2': 
-                                            queue.toggle_repeat()
+                                        if opt == '1': queue.toggle_shuffle()
+                                        elif opt == '2': queue.toggle_repeat()
 
                             except Exception as e:
                                 print(f"Error: {e}")
-                                if main.prompt("Try again? (y/n): ") != 'y': 
-                                    break
+                                if main.prompt("Try again? (y/n): ") != 'y': break
                             break
 
                     elif choice == '2':
@@ -158,28 +154,22 @@ class main:
                                 elif choice == '1':
                                     print("1 → Toggle Shuffle\n2 → Toggle Repeat")
                                     opt = main.prompt("Choose: ")
-                                    if opt == '1': 
-                                        queue.toggle_shuffle()
-                                    elif opt == '2': 
-                                        queue.toggle_repeat()
-                                elif choice == '2': 
-                                    break
+                                    if opt == '1': queue.toggle_shuffle()
+                                    elif opt == '2': queue.toggle_repeat()
+                                elif choice == '2': break
 
                         except ValueError:
                             print("Invalid input. Enter a valid number.")
 
-                    elif choice == '0': 
-                        break
+                    elif choice == '0': break
 
             elif choice == '1':
-                self.library.createTrack()
-                self.data = load()
+                self.library.createTrack(); self.data = load()
 
             elif choice == '2':
                 self.banner("MUSIC LIBRARY")
                 print(f"Total Duration: {self.library.getTotalDuration()}\n")
                 self.library.displayTracks()
-                input("\nPress Enter to continue...")
 
             elif choice == '3':
                 self.playlist.createPlaylist()
@@ -187,43 +177,9 @@ class main:
             elif choice == '4':
                 while True:
                     self.banner("PLAYLIST MANAGER")
-                    self.data = load()
-                    
-                    if "Playlists" not in self.data or not self.data["Playlists"]:
-                        print("No playlists available.")
-                        print("\nE → Exit to Main Menu")
-                        choice = main.prompt("Choose: ")
-                        if choice == 'e': 
-                            break
-                        continue
-                    
-                    print("Available Playlists:\n")
-                    
-                    # Display each playlist with its tracks and duration
-                    counter = 1
-                    self.playlist.updatePlaylistList()
-                    
-                    for playlist_dict in self.data["Playlists"]:
-                        for playlist_name, tracks in playlist_dict.items():
-                            # Calculate duration for this playlist
-                            playlist_duration = total_duration(tracks)
-                            track_count = len(tracks)
-                            
-                            print(f"  [{counter}] {playlist_name}")
-                            print(f"      Duration: {playlist_duration} | Tracks: {track_count}")
-                            
-                            if tracks:
-                                # Sort and display tracks
-                                sorted_tracks = merge_sort(tracks[:], key="title")
-                                for idx, track in enumerate(sorted_tracks, 1):
-                                    print(f"      {idx}. {track['title']} by {track['artist']} ({sec_to_min(track['duration'])})")
-                            else:
-                                print("      (No tracks)")
-                            print()
-                            counter += 1
-                    
-                    print("-" * 60)
-                    print("A → Add Tracks to Playlist")
+                    print("Available Playlists:")
+                    self.playlist.displayPlaylists()
+                    print("\nA → Add Tracks to Playlist")
                     print("E → Exit to Main Menu")
 
                     choice = main.prompt("Choose: ")
@@ -233,8 +189,7 @@ class main:
                         self.playlist.displayPlaylists()
                         try:
                             idx = int(input("Enter number: ")) - 1
-                            if idx < 0 or idx >= len(self.playlist.list): 
-                                raise ValueError
+                            if idx < 0 or idx >= len(self.playlist.list): raise ValueError
                             playlist_name = self.playlist.list[idx]
                         except ValueError:
                             print("Invalid playlist.")
@@ -260,15 +215,17 @@ class main:
                             except ValueError:
                                 print("Invalid input.")
 
-                    elif choice == 'e': 
-                        break
+                    elif choice == 'e': break
                     else:
-                        print("Invalid selection.")
+                        try:
+                            index = int(choice)
+                            self.playlist.displayTracks(index)
+                        except:
+                            print("Invalid selection.")
 
             elif choice == '0':
                 print("Goodbye!")
                 break
-
 
 if __name__ == "__main__":
     run = main()
