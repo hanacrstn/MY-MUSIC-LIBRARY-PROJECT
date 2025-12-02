@@ -1,9 +1,7 @@
-
 from Track import Track
-from json_utilz import load, save
-from Duration import sec_to_min
-from sort import merge_sort
-
+from Util_Jason import load, save
+from Duration import sec_to_min, total_duration  # Import total_duration
+from Sorting import merge_sort
 
 class MusicLibrary:
     def __init__(self) -> None:
@@ -21,7 +19,7 @@ class MusicLibrary:
 
             track_id = len(self.data["Tracks"]) + 1  
             new_track = Track(track_id, title, artist, album, duration)
-            if new_track.getDuration() == "invalid":
+            if new_track.duration == "invalid":
                 print("\n>> Failed to add track due to invalid input. Must be in mm:ss or in raw seconds.")
             else:
                 self.data["Tracks"].append(new_track.to_dict())
@@ -30,7 +28,6 @@ class MusicLibrary:
 
         except ValueError as e:
             print(f"Error adding track: {e}")
-
 
     def displayTracks(self):
         if "Tracks" not in self.data or not self.data["Tracks"]:
@@ -44,4 +41,7 @@ class MusicLibrary:
         for track in sorted_tracks:
             print(f"\t[{track_counter}]   {track['title']} by {track['artist']} ({sec_to_min(track['duration'])})")
             track_counter += 1
-        
+
+    def getTotalDuration(self):
+        """Get total duration of all tracks"""
+        return total_duration(self.data, "Tracks")
