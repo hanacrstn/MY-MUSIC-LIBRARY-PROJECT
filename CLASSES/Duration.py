@@ -1,42 +1,85 @@
-
 def total_duration(data, key=None):
-    counter = 0
-    for track in data[key]:
-        total_sec = int(track["duration"])
-        counter = counter +  total_sec
-
-    minutes = counter // 60
-    seconds = counter % 60
-    hours = minutes//60
-
-    minutes = minutes % 60
-
-    if hours > 0:
-        return f"{hours} hr/s {minutes} mins and {seconds}s"
-    elif minutes > 0:
-        return f"{minutes} mins and {seconds}s"
+    if key and isinstance(data, dict):
+        tracks = data.get(key, [])
     else:
-        return f"{seconds}s"
+        tracks = data if isinstance(data, list) else []
     
-def sec_to_min(duration):
-    if ":" not in duration:
-        minutes = int(duration) // 60
-        seconds = int(duration) % 60
+    total_seconds = sum(int(track.get("duration", 0)) for track in tracks)
+    return format_duration(total_seconds)
 
-        return f"{minutes:02}:{seconds:02}"
+
+def format_duration(total_seconds):
+    hours = total_seconds // 3600
+    minutes = (total_seconds % 3600) // 60
+    seconds = total_seconds % 60
     
+    parts = []
+    if hours > 0:
+        parts.append(f"{hours} hr{'s' if hours != 1 else ''}")
+    if minutes > 0:
+        parts.append(f"{minutes} min{'s' if minutes != 1 else ''}")
+    if seconds > 0 or not parts:
+        parts.append(f"{seconds}s")
+    
+    return " ".join(parts)
+
+
+def sec_to_min(duration):
+    if isinstance(duration, str) and ":" in duration:
+        return duration
+    
+    try:
+        total_seconds = int(duration)
+        minutes = total_seconds // 60
+        seconds = total_seconds % 60
+        return f"{minutes:02d}:{seconds:02d}"
+    except (ValueError, TypeError):
+        return "00:00"
+
+
 def checkformat(duration):
+    if not duration:
+        return "invalid"
+    
+    duration = str(duration).strip()
+    
     if ":" in duration:
         parts = duration.split(":")
+        if len(parts) != 2:
+            return "invalid"
+        
         try:
-            if len(parts) == 2:
-                minutes = int(parts[0]) * 60
-                seconds = int(parts[1]) 
-                return str(minutes + seconds)
+            minutes = int(parts[0])
+            seconds = int(parts[1])
+            if minutes < 0 or seconds < 0 or seconds >= 60:
+                return "invalid"
+            return str(minutes * 60 + seconds)
         except ValueError:
             return "invalid"
     else:
         try:
-            return str(int(duration))
+            seconds = int(duration)
+            if seconds < 0:
+                return "invalid"
+            return str(seconds)
         except ValueError:
             return "invalid"
+
+
+def min_to_sec(duration_str):
+    if ":" not in duration_str:
+        try:
+            return int(duration_str)
+        except ValueError:
+            return 0
+    
+    parts = duration_str.split(":")
+    if len(parts) != 2:
+        return 0
+    
+    try:
+        minutes = int(parts[0])
+        seconds = int(parts[1])
+        return minutes * 60 + seconds
+    except ValueError:
+        return 0
