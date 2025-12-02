@@ -298,7 +298,7 @@ class main:
             self.playlist.updatePlaylistList()
             
             self.banner("PLAYLIST MANAGER")
-            print("\nV → View All Playlists (Paginated)")
+            print("\nV → View All Playlists")
             print("A → Add Tracks to Playlist")
             print("R → Remove Track from Playlist")
             print("D → Delete Playlist")
