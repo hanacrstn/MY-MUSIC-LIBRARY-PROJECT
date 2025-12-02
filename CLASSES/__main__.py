@@ -2,13 +2,13 @@
 #MAIN Class
 
 from Track import Track
-from MusicLibrary import MusicLibrary
+from Library import MusicLibrary
 from Playlist import Playlist
-from json_utilz import load, save
+from Util_Jason import load, save
 from Duration import total_duration
-from queue_ import Queue
-from sort import merge_sort
-from pagination import Pagination
+from Queues import Queue
+from Sorting import merge_sort
+from Pagination import Pagination
 
 class main:
     def __init__(self):
@@ -169,7 +169,7 @@ class main:
 
             elif choice == '2':
                 self.banner("MUSIC LIBRARY")
-                print(f"Total Duration: {total_duration(self.data, 'Tracks')}\n")
+                print(f"Total Duration: {self.library.getTotalDuration()}\n")
                 self.library.displayTracks()
                 input("\nPress Enter to continue...")
 
