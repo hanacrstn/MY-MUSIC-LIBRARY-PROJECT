@@ -1,4 +1,4 @@
-#MAIN Class
+#MAIN Class 
 
 from Track import Track
 from Library import MusicLibrary
@@ -26,9 +26,9 @@ class main:
         return input(args).lower()
 
     def banner(self, title):
-        print("\n" + "╔" * 60)
+        print("\n" + "═" * 60)
         print(title.center(60))
-        print("╔" * 60)
+        print("═" * 60)
 
     def add_tracks_to_queue(self):
         """Add tracks to current queue from library or playlist"""
@@ -153,29 +153,35 @@ class main:
                 break
 
     def _play_queue(self):
-        """Generic queue player - handles all playback"""
+        """Generic queue player - handles all playback with proper exit"""
         while True:
             if self.queue.size == 0:
-                print("\nQueue is now empty. All tracks have been played.")
+                print("\n" + "=" * 60)
+                print("Queue Finished - All tracks played!".center(60))
+                print("=" * 60)
+                input("\nPress Enter to return to menu...")
                 break
             
-            print(f"Shuffle: {self.queue.shuffle_status()} | Repeat: {self.queue.repeat_status()}\n")
+            print(f"\nShuffle: {self.queue.shuffle_status()} | Repeat: {self.queue.repeat_status()}")
             print(self.queue)
             print("\nOPTIONS:")
             print("  N → Next Track")
             print("  1 → Playback Settings (Shuffle / Repeat)")
             print("  2 → Exit Player")
 
-            choice = main.prompt("Enter choice: ")
+            choice = main.prompt("\nEnter choice: ")
 
             if choice == '2':
                 break
             elif choice == 'n':
                 result = self.queue.next()
                 if isinstance(result, dict):
-                    print(f"NOW PLAYING: {self.queue.current_play()}")
+                    print(f"\n▶ NOW PLAYING: {self.queue.current_play()}")
                 else:
-                    print(result)
+                    print(f"\n{result}")
+                    if "empty" in result.lower():
+                        input("\nPress Enter to continue...")
+                        break
             elif choice == '1':
                 self._playback_settings()
 
@@ -191,6 +197,19 @@ class main:
         elif opt == '2':
             self.queue.toggle_repeat()
             print(f"Repeat: {self.queue.repeat_status()}")
+
+    def _warn_queue_overwrite(self, action_name):
+        """Show warning before overwriting queue"""
+        if self.queue.size > 0:
+            print("\n" + "!" * 60)
+            print(f"WARNING: {action_name} will replace your current queue!".center(60))
+            print(f"Current queue: {self.queue.size} track(s) | Shuffle: {self.queue.shuffle_status()} | Repeat: {self.queue.repeat_status()}".center(60))
+            print("!" * 60)
+            confirm = input("\nContinue and clear current queue? (y/n): ").lower()
+            if confirm != 'y':
+                print("\nOperation cancelled.")
+                return False
+        return True
 
     def _music_player_menu(self):
         """Handle music player submenu"""
@@ -228,43 +247,61 @@ class main:
             elif choice == '5':
                 if input("Clear queue? All data will be lost. (y/n): ").lower() == 'y':
                     self.queue.clear_queue()
-                    print("\nQueue cleared successfully!")
+                    print("\n✓ Queue cleared successfully!")
             
             elif choice == '0':
                 break
 
     def _play_from_library(self):
-        """Play all tracks from library"""
+        """Play all tracks from library with queue overwrite warning"""
+        # Check if queue will be overwritten
+        if not self._warn_queue_overwrite("Playing from library"):
+            return
+        
         try:
             self.data = load()
-            tracks = merge_sort(self.data["Tracks"][:], "title")
-            self.queue = Queue()
+            tracks = self.data.get("Tracks", [])
+            
+            if not tracks:
+                print("\nNo tracks in library. Add some tracks first!")
+                input("\nPress Enter to continue...")
+                return
+            
+            sorted_tracks = merge_sort(tracks[:], "title")
+            
+            # Clear and rebuild queue
+            self.queue.clear_queue()
+            self.queue.enqueue_playlist(sorted_tracks)
 
             self.banner("PLAYING FROM LIBRARY")
-            print(f"Total Duration: {total_duration(self.data, 'Tracks')}\n")
-
-            for t in tracks:
-                self.queue.enqueue(t)
-
-            print(f"NOW PLAYING: {self.queue.current_play()}\n")
+            print(f"Total Duration: {total_duration(self.data, 'Tracks')}")
+            print(f"Total Tracks: {len(sorted_tracks)}\n")
+            print(f"▶ NOW PLAYING: {self.queue.current_play()}\n")
+            
             self._play_queue()
 
         except Exception as e:
-            print(f"Error: {e}")
+            print(f"\n>> Error: {e}")
             if main.prompt("Try again? (y/n): ") == 'y':
                 self._play_from_library()
 
     def _play_from_playlist(self):
-        """Play tracks from selected playlist"""
+        """Play tracks from selected playlist with queue overwrite warning"""
         self.banner("PLAYING FROM PLAYLIST")
+        
+        self.playlist.updatePlaylistList()
+        
+        if not self.playlist.list:
+            print("\nNo playlists available. Create a playlist first!")
+            input("\nPress Enter to continue...")
+            return
+        
         print("Select a playlist:\n")
-
         self.playlist.displayPlaylists()
         print("0 → Go Back")
 
         try:
-            playlist_choice = int(main.prompt("Enter number: "))
-            self.playlist.updatePlaylistList()
+            playlist_choice = int(main.prompt("\nEnter number: "))
 
             if playlist_choice == 0:
                 return
@@ -279,11 +316,18 @@ class main:
                 print("This playlist has no tracks.")
                 return
 
+            # Check if queue will be overwritten
+            if not self._warn_queue_overwrite(f"Playing playlist '{playlist_name}'"):
+                return
+
             sorted_tracks = merge_sort(playlist_tracks, key="title")
-            self.queue = Queue()
+            
+            # Clear and rebuild queue
+            self.queue.clear_queue()
             self.queue.enqueue_playlist(sorted_tracks)
 
-            print(f"NOW PLAYING FROM: {playlist_name}\n")
+            print(f"\n▶ NOW PLAYING FROM: {playlist_name}")
+            print(f"Total Tracks: {len(sorted_tracks)}")
             print(f"NOW PLAYING: {self.queue.current_play()}\n")
 
             self._play_queue()
@@ -336,7 +380,6 @@ class main:
 
     def _remove_track_from_playlist(self):
         """Remove track from playlist helper"""
-        # Reinitialize to get fresh data
         self.playlist = Playlist()
         
         print("\nSelect a playlist:")
@@ -353,8 +396,7 @@ class main:
 
     def _add_track_to_playlist(self):
         """Add track to playlist helper"""
-        # CRITICAL: Reload playlist data to get latest changes
-        self.playlist = Playlist()  # Reinitialize to get fresh data
+        self.playlist = Playlist()
         
         print("\nSelect a playlist:")
         self.playlist.displayPlaylists()
@@ -426,7 +468,7 @@ class main:
         while True:
             self.banner("GROUP 3'S MUSIC PLAYER")
             print("Press [M] to Open Music Player".center(60))
-            print("╔" * 60)
+            print("═" * 60)
 
             print("MAIN MENU")
             print("-" * 45)
@@ -458,7 +500,10 @@ class main:
             elif choice == '5':
                 self._playlist_manager_menu()
             elif choice == '0':
-                print("Goodbye!")
+                print("\n" + "=" * 60)
+                print("Thanks for using Group 3's Music Player!".center(60))
+                print("Goodbye!".center(60))
+                print("=" * 60 + "\n")
                 break
 
 if __name__ == "__main__":
