@@ -8,7 +8,7 @@ class Node:
     def __init__(self, track=None):
         self.track = track
         self.next = None
-        self.prev = None  # Added for doubly linked list
+        self.prev = None  
 
 class Queue:
     def __init__(self):
