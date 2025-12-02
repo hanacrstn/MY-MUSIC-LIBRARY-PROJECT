@@ -1,7 +1,7 @@
-from Track import Track, Playlist_
-from json_utilz import load, save
+from Track import Track
+from Util_Jason import load, save  
 from Duration import total_duration, sec_to_min
-from sort import merge_sort
+from Sorting import merge_sort  
 
 class Playlist:
     def __init__(self):
@@ -101,7 +101,7 @@ class Playlist:
             print(f"    [{counter}] {track['title']} by {track['artist']} ({track['duration']})")
             counter += 1
 
-        return results  # No need for double iteration over results
+        return results
 
 
     def searchedTracks(self, option, playlist_name, matching_tracks):
@@ -168,5 +168,3 @@ class Playlist:
                 except ValueError:
                     print("\nInvalid input. Please enter a valid number.")
                 return
-
-    
