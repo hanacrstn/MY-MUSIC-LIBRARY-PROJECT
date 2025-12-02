@@ -7,17 +7,24 @@ class Playlist:
     def __init__(self):
         self.data = load()
         self.list = []
+        self.updatePlaylistList()  # Initialize list on creation
 
     def updatePlaylistList(self):
+        """FIXED: Always reload data to ensure sync"""
+        self.data = load()
         self.list = [name for playlist in self.data.get("Playlists", []) for name in playlist]
 
     def _track_exists_in_playlist(self, track, playlist_tracks):
+        """Check if track already exists in playlist"""
         return any(t["id"] == track["id"] or 
                    (t["title"].lower() == track["title"].lower() and 
                     t["artist"].lower() == track["artist"].lower())
                    for t in playlist_tracks)
 
     def _find_playlist_tracks(self, playlist_name):
+        """Find and return tracks for a specific playlist"""
+        # Reload data to ensure freshness
+        self.data = load()
         for playlist in self.data.get("Playlists", []):
             if playlist_name in playlist:
                 return playlist[playlist_name]
@@ -65,12 +72,16 @@ class Playlist:
                     print("Invalid input.")
 
     def createPlaylist(self):
+        """Create a new playlist with validation"""
         while True:
             playlistName = input("Enter Playlist Name: ").strip()
             
             if not playlistName:
                 print("\nPlaylist name cannot be empty. Please try again.\n")
                 continue
+            
+            # Reload to check for existing names
+            self.data = load()
             
             if "Playlists" not in self.data:
                 self.data["Playlists"] = []
@@ -85,7 +96,6 @@ class Playlist:
 
             self.data["Playlists"].append({playlistName: []})
             save(self.data)
-            self.data = load()
             print("\n" + "=" * 60)
             print("✓ Playlist added successfully!".center(60))
             print(f"'{playlistName}' created.".center(60))
@@ -94,8 +104,8 @@ class Playlist:
             break
 
     def displayTracks(self, playlist_index):
-        self.data = load()
-        self.updatePlaylistList()
+        """Display tracks in a specific playlist with pagination"""
+        self.updatePlaylistList()  # Ensure fresh data
         
         try:
             playlist_name = self.list[int(playlist_index) - 1]
@@ -144,8 +154,8 @@ class Playlist:
             print("\nInvalid input. Please enter a valid playlist number.")
     
     def displayPlaylists(self, with_pagination=False, allow_selection=False):
-        self.data = load()
-        self.updatePlaylistList()
+        """Display all playlists"""
+        self.updatePlaylistList()  # Ensure fresh data
         
         if not self.list:
             print("There are no Playlists made!")
@@ -188,6 +198,7 @@ class Playlist:
                         print("Invalid option.")
 
     def searchTrack(self, track):
+        """Search for tracks across library"""
         self.data = load()
         tracks = self.data.get("Tracks", [])
         if not tracks:
@@ -232,6 +243,8 @@ class Playlist:
         return results
 
     def searchedTracks(self, option, playlist_name, matching_tracks):
+        """Add searched tracks to playlist"""
+        # FIXED: Reload data before accessing
         self.data = load()
         playlist_tracks = self._find_playlist_tracks(playlist_name)
         
@@ -286,6 +299,8 @@ class Playlist:
         return False
 
     def displayTracksForSelection(self):
+        """Display tracks for selection"""
+        self.data = load()  # Ensure fresh data
         tracks = merge_sort(self.data.get("Tracks", []), key="title")
         def track_formatter(t):
             feat = f" (ft. {t.get('featured_artist', '')})" if t.get('featured_artist') else ""
@@ -293,13 +308,13 @@ class Playlist:
         return self._paginated_selection(tracks, "Select a Track", track_formatter, allow_selection=True)
 
     def addTrack(self, playlist_name):
-        self.data = load()
-        
+        """Add a single track to playlist"""
         selected_track = self.displayTracksForSelection()
         if not selected_track:
             print("\nTrack addition cancelled.")
             return
 
+        # FIXED: Reload to get fresh playlist data
         self.data = load()
         
         playlist_tracks = self._find_playlist_tracks(playlist_name)
@@ -315,6 +330,7 @@ class Playlist:
             print(f"\n{'=' * 60}\n✓ Track added successfully!\n{'=' * 60}\n")
 
     def removeTrackFromPlaylist(self, playlist_name):
+        """Remove a track from playlist"""
         self.data = load()
         
         playlist_tracks = self._find_playlist_tracks(playlist_name)
@@ -340,7 +356,7 @@ class Playlist:
                 print("\nRemoval cancelled.")
 
     def deletePlaylist(self):
-        self.data = load()
+        """Delete an entire playlist"""
         self.updatePlaylistList()
         
         if not self.list:
@@ -358,6 +374,8 @@ class Playlist:
             
             playlist_name = self.list[idx]
             if input(f"\nAre you sure you want to delete '{playlist_name}'? (y/n): ").lower() == 'y':
+                # Reload to ensure we're modifying fresh data
+                self.data = load()
                 for i, playlist in enumerate(self.data["Playlists"]):
                     if playlist_name in playlist:
                         self.data["Playlists"].pop(i)
