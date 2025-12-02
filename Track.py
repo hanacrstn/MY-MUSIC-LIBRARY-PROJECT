@@ -7,7 +7,12 @@ class Track:
         self.artist = artist.strip() if artist else ""
         self.featured_artist = featured_artist.strip() if featured_artist else ""
         self.album = album.strip() if album else ""
-        self.duration = checkformat(duration)
+        
+        # FIXED: Validate duration before storing
+        validated_duration = checkformat(duration)
+        if validated_duration == "invalid" or validated_duration is None:
+            raise ValueError(f"Invalid duration format: '{duration}'. Use mm:ss or seconds.")
+        self.duration = validated_duration
 
     def to_dict(self):
         return {
