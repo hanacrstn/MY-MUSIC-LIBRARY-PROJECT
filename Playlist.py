@@ -85,7 +85,7 @@ class Playlist:
 
             self.data["Playlists"].append({playlistName: []})
             save(self.data)
-            self.data = load()  # Reload data after saving
+            self.data = load()
             print("\n" + "=" * 60)
             print("✓ Playlist added successfully!".center(60))
             print(f"'{playlistName}' created.".center(60))
@@ -94,10 +94,16 @@ class Playlist:
             break
 
     def displayTracks(self, playlist_index):
+        self.data = load()
         self.updatePlaylistList()
+        
         try:
             playlist_name = self.list[int(playlist_index) - 1]
             playlist_tracks = self._find_playlist_tracks(playlist_name)
+            
+            if playlist_tracks is None:
+                print("\nPlaylist not found.")
+                return
             
             if not playlist_tracks:
                 print("\nNo tracks found in this playlist.")
@@ -138,7 +144,9 @@ class Playlist:
             print("\nInvalid input. Please enter a valid playlist number.")
     
     def displayPlaylists(self, with_pagination=False, allow_selection=False):
+        self.data = load()
         self.updatePlaylistList()
+        
         if not self.list:
             print("There are no Playlists made!")
             return None
@@ -221,18 +229,13 @@ class Playlist:
             elif choice == 'c':
                 print("\nSearch cancelled.")
                 return None
-            else:
-                print("Invalid option.")
         return results
 
     def searchedTracks(self, option, playlist_name, matching_tracks):
-        # Reload data to ensure we have latest
         self.data = load()
         playlist_tracks = self._find_playlist_tracks(playlist_name)
         
         if playlist_tracks is None:
-            print(f"\n[DEBUG] Looking for playlist: '{playlist_name}'")
-            print(f"[DEBUG] Available playlists: {[list(p.keys())[0] for p in self.data.get('Playlists', [])]}")
             print("\nPlaylist not found.")
             return False
 
@@ -290,7 +293,6 @@ class Playlist:
         return self._paginated_selection(tracks, "Select a Track", track_formatter, allow_selection=True)
 
     def addTrack(self, playlist_name):
-        # Reload data FIRST before anything else
         self.data = load()
         
         selected_track = self.displayTracksForSelection()
@@ -298,13 +300,10 @@ class Playlist:
             print("\nTrack addition cancelled.")
             return
 
-        # Reload data again after user interaction to ensure freshness
         self.data = load()
         
         playlist_tracks = self._find_playlist_tracks(playlist_name)
         if playlist_tracks is None:
-            print(f"\n[DEBUG] Looking for playlist: '{playlist_name}'")
-            print(f"[DEBUG] Available playlists: {[list(p.keys())[0] for p in self.data.get('Playlists', [])]}")
             print("\nPlaylist not found.")
             return
 
@@ -316,8 +315,10 @@ class Playlist:
             print(f"\n{'=' * 60}\n✓ Track added successfully!\n{'=' * 60}\n")
 
     def removeTrackFromPlaylist(self, playlist_name):
+        self.data = load()
+        
         playlist_tracks = self._find_playlist_tracks(playlist_name)
-        if not playlist_tracks:
+        if playlist_tracks is None or not playlist_tracks:
             print("\nThis playlist has no tracks to remove.")
             return
         
@@ -339,7 +340,9 @@ class Playlist:
                 print("\nRemoval cancelled.")
 
     def deletePlaylist(self):
+        self.data = load()
         self.updatePlaylistList()
+        
         if not self.list:
             print("\nThere are no playlists to delete!")
             return
